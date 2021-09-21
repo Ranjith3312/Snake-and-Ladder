@@ -1,0 +1,199 @@
+
+import java.util.*;
+                                        /*SNAKE AND LADDER GAME*/
+public class Main   {
+	
+	static void Board() {
+		String [][] n=new String[10][10];/* Create an string array for Snake and Ladder Board */
+		/* The below logics of code is to make Board*/
+		int num=100;
+		int num2 =81;
+		for(int i=0;i<10;i++) {
+			if(i%2==0) {
+				for(int j=0;j<10;j++) {
+				   n[i][j]=String.valueOf(num);
+				   
+				   num--;
+				}
+				num=num-10;
+			}
+			else {
+				for(int j=0;j<10;j++) {
+					n[i][j]=String.valueOf(num2);
+					num2++;
+				}
+				num2=num2-30;
+			}
+		}
+		/* the below assigns  for where the ladder and snakes are placed */
+		n[9][5]="L1";/* L1 means the bottom of ladder of L1*/
+		n[7][6]="L1";/* this L1 means the top of ladder L1*/
+		n[8][3]="L2";
+		n[0][7]="L2";
+		n[0][5]="S1";
+		n[4][4]="S1";
+		n[3][1]="S2";
+		n[1][2]="S2";
+		n[0][0]="HM";/*HM represents Home When the player reaches Home ,the player wins the match and match is over */
+		players(n);
+		
+		
+	}
+	static void players( String [][] n) {
+		Scanner ne=new Scanner (System.in);
+		int player;
+		String [] player_names= new String[] {"AA","BB","CC","DD"};/* players limit is 4*/
+		System.out.print("Enter the how many players you want to play");
+		player=ne.nextInt();
+		int [] row=new int[player] ;/*Initialize the position of the players   */
+		Arrays.fill(row, 9);
+		int [] coloum=new int[player] ;/*Initialize the position of the players   */
+		Arrays.fill(coloum, 0);
+		String [] val=new String[player] ;/* get the value of the player in which box ,example(A is a player in 4th box,then val of the player is 4*/
+		Arrays.fill(val, "1");/* Initially the val of players in 1*/ 
+		int count=0;
+		while(count==0) {
+			for(int i=0;i<player;i++) {
+				System.out.println("Press 1 and Enter to throw the dice "+(i+1)+"st player");
+				int press=ne.nextInt();
+				int move=(int)(Math.random()*(6-1+1)+1);
+				System.out.println("your dice value is"+move);
+				System.out.println("");
+				int counte=0;
+				for(int j=0;j<player;j++) {/* this logics for to check whether more than one player in the same position*/
+					 counte=0;
+					 if(row[i]==row[j] && coloum[i]==coloum[j] && i!=j ) {
+						 if(row[i]==9 && coloum[i]==0 && row[j]==9 && coloum[j]==0 ) {
+							 continue;
+						 }
+						 else {
+							 counte++;
+							 val[j]=val[i];/*if the logic is true ,this assign executes */							 							 
+						 }						
+					 }
+				}
+				
+				if(counte==0) {/* if count is 0,then above logic is false*/
+					n[row[i]][coloum[i]]=val[i];
+				}			
+				if(row[i]%2!=0 ) {
+					int s=coloum[i]+move;/*s is sum of current position and moves  */
+					if(s>9) {/*if s is greater than 9,the player is move to next row and respective coloumn  */
+						int r=row[i]-1;
+						int c=(9-(s-9))+1;
+						if(r>=0 && c>=0) {
+							row[i]=r;
+							coloum[i]=c;
+							val[i]=match(n,player_names[i],row[i],coloum[i],i,row,coloum);
+						}
+						else {
+							System.out.print("you can't move");							
+						}
+					}
+					else {
+						coloum[i]=s;
+						val[i]=match(n,player_names[i],row[i],coloum[i],i,row,coloum);
+					}					
+					if(row[i]==0 && coloum[i]==0) {
+						System.out.print("player"+i+"wins the match");
+						count=1;
+						break;
+					}					
+				}
+				else {
+					int s=coloum[i]-move;
+					if(s<0) {
+						int re=row[i]-1;
+						int ce=(-(s))-1;
+						if(re>=0 && ce>=0) {
+							row[i]=re;
+							coloum[i]=ce;			
+							val[i]=match(n,player_names[i],row[i],coloum[i],i,row,coloum);
+						}
+						else {
+							System.out.print("you can't move");
+							System.out.println("");
+							n[row[i]][coloum[i]]=player_names[i];
+							for(int l=0;l<10;l++) {
+								for(int j=0;j<10;j++) {
+									System.out.print(n[l][j]);
+									System.out.print("    ");
+									if(l==9 ) {
+										System.out.print(" ");										
+									}
+								}
+								System.out.println("");
+							}
+						}		
+					}
+					else {
+						coloum[i]=s;
+						val[i]=match(n,player_names[i],row[i],coloum[i],i,row,coloum);	
+					}
+					if(row[i]==0 && coloum[i]==0) {
+						System.out.print("player"+(i+1)+"wins the match");
+						count=1;
+						break;
+					}
+				}		
+			}
+		}		
+	}
+	static String match( String [][] n,String player_names,int row,int coloum,int i,int [] rowq,int[] coloumn) {		
+		String l=n[row][coloum];
+		if(row==9 && coloum==5) {
+			n[7][6]=player_names;
+			rowq[i]=7;
+			coloumn[i]=6;
+			
+		}
+		else if(row==8 && coloum==3) {
+			n[0][7]=player_names;
+			rowq[i]=0;
+			coloumn[i]=7;
+		}
+		else if(row==0 && coloum==5) {
+			
+			n[4][4]=player_names;
+			rowq[i]=4;
+			coloumn[i]=4;
+		}
+		else if(row==3 && coloum==1) 
+		{
+			
+			n[1][2]=player_names;
+			rowq[i]=1;
+			coloumn[i]=2;
+		}
+		else {
+		n[row][coloum]=player_names;
+		}
+		for(int s=0;s<10;s++) {
+			for(int j=0;j<10;j++) {
+				System.out.print(n[s][j]);
+				System.out.print("        ");
+				if(s==9 ) {
+					
+					if(j>4) {
+						System.out.print(" ");
+					}
+					else {
+						System.out.print(" ");
+					}
+					
+				}
+			}
+			System.out.println("");
+		}
+		return l;
+	}
+	public static void main(String[] args) {
+		Board();
+		System.out.println("");
+		System.out.print("**********************the match is over*****************");
+		
+	
+    }
+	
+}
+
